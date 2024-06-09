@@ -126,34 +126,32 @@ def _quote_to_html_node(block: str) -> HTMLNode:
 def _unordered_list_to_html_node(block: str) -> HTMLNode:
     """Convert an unordered list in Markdown into an HTMLNode."""
 
-    ul_children = []
+    ul_children: List[HTMLNode] = []
     list_text = block.split("\n")
     list_text = [x[2:] for x in list_text]
     textnodes = list(map(text_to_textnodes, list_text))
     for entry in textnodes:
         if len(entry) != 1:
             entry_as_html = list(map(text_node_to_html_node, entry))
-            entry_as_li = ParentNode(entry_as_html, "li")
+            ul_children.append(ParentNode(entry_as_html, "li"))
         else:
-            entry_as_li = LeafNode(entry[0].text, "li")
-        ul_children.append(entry_as_li)
+            ul_children.append(LeafNode(entry[0].text, "li"))
     return ParentNode(ul_children, "ul")
 
 
 def _ordered_list_to_html_node(block: str) -> HTMLNode:
     """Convert an ordered list in Markdown into an HTMLNode."""
 
-    ol_children = []
+    ol_children: List[HTMLNode] = []
     list_text = block.split("\n")
     list_text = [x[3:] for x in list_text]
     textnodes = list(map(text_to_textnodes, list_text))
     for entry in textnodes:
         if len(entry) != 1:
             entry_as_html = list(map(text_node_to_html_node, entry))
-            entry_as_li = ParentNode(entry_as_html, "li")
+            ol_children.append(ParentNode(entry_as_html, "li"))
         else:
-            entry_as_li = LeafNode(entry[0].text, "li")
-        ol_children.append(entry_as_li)
+            ol_children.append(LeafNode(entry[0].text, "li"))
     return ParentNode(ol_children, "ol")
 
 
