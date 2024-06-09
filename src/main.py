@@ -1,5 +1,5 @@
 from copy_directory_contents import copy_directory_contents
-from markdown_operations import generate_pages_recursive
+from page_generator import generate_pages_recursive
 
 
 def main():
