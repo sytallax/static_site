@@ -71,3 +71,6 @@ class TestSplitNodesImage(unittest.TestCase):
             TextNode(" image.", "text")
         ]
         self.assertEqual(split_nodes_image(nodes), expected)
+
+if __name__ == "__main__":
+    unittest.main()

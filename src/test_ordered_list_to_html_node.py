@@ -32,3 +32,6 @@ class TestOrderedListToHTMLNode(unittest.TestCase):
             "ol"
         )
         self.assertEqual(_ordered_list_to_html_node(block), expected)
+
+if __name__ == "__main__":
+    unittest.main()

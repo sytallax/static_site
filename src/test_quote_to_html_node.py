@@ -13,3 +13,6 @@ class TestQuoteToHTMLNode(unittest.TestCase):
         block = "> This will be a quote\n> with multiple lines"
         expected = LeafNode("This will be a quote with multiple lines", "blockquote")
         self.assertEqual(_quote_to_html_node(block), expected)
+
+if __name__ == "__main__":
+    unittest.main()

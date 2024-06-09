@@ -13,3 +13,6 @@ class TestCodeToHTMLNode(unittest.TestCase):
         block = "```This is also a code block```"
         expected = ParentNode([LeafNode("This is also a code block", "code")], "pre")
         self.assertEqual(_code_to_html_node(block), expected)
+
+if __name__ == "__main__":
+    unittest.main()

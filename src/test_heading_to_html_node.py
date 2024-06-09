@@ -37,3 +37,6 @@ class TestHeadingToHTMLNode(unittest.TestCase):
             "h2",
         )
         self.assertEqual(_heading_to_html_node(block), expected)
+
+if __name__ == "__main__":
+    unittest.main()

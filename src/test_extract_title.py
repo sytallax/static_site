@@ -20,3 +20,6 @@ class TestExtractTitle(unittest.TestCase):
             self.assertEqual(f"{e}", expected)
         else:
             raise AssertionError("Expected exception not raised")
+
+if __name__ == "__main__":
+    unittest.main()

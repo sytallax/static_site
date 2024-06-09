@@ -34,3 +34,6 @@ class TestExtractMarkdownFromImages(unittest.TestCase):
     def test_invalid_image_3(self):
         input = "This is ![not(https://brokenlink.com/fake) an image."
         self.assertEqual(extract_markdown_images(input), [])
+
+if __name__ == "__main__":
+    unittest.main()

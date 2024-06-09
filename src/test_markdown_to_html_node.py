@@ -46,3 +46,6 @@ class TestMarkdownToHTMLNode(unittest.TestCase):
             "div",
         )
         self.assertEqual(markdown_to_html_node(markdown), expected)
+
+if __name__ == "__main__":
+    unittest.main()

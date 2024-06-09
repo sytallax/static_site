@@ -69,3 +69,6 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             TextNode(" bold text", "text"),
         ]
         self.assertEqual(split_nodes_delimiter(nodes, "**", "bold"), expected)
+
+if __name__ == "__main__":
+    unittest.main()

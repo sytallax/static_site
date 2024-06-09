@@ -79,3 +79,6 @@ class TestParentNode(unittest.TestCase):
             '<p>This is normal text with <a href="https://google.com">links</a></p>'
         )
         self.assertEqual(node.to_html(), expected)
+
+if __name__ == "__main__":
+    unittest.main()

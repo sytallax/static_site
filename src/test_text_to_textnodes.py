@@ -23,3 +23,6 @@ class TestTextToTextNodes(unittest.TestCase):
         text = "This is just normal text. This should only return one TextNode object."
         expected = [TextNode("This is just normal text. This should only return one TextNode object.", "text")]
         self.assertEqual(text_to_textnodes(text), expected)
+
+if __name__ == "__main__":
+    unittest.main()

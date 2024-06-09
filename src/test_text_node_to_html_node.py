@@ -11,3 +11,6 @@ class TestTextModeToHtmlNode(unittest.TestCase):
         node = TextNode("This is normal text", "text")
         expected = LeafNode(value="This is normal text")
         self.assertEqual(text_node_to_html_node(node), expected)
+
+if __name__ == "__main__":
+    unittest.main()

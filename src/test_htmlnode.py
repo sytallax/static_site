@@ -25,3 +25,6 @@ class TestHTMLNode(unittest.TestCase):
         node = HTMLNode("a", "Click this link", [], {"href": "https://google.com"})
         node2 = HTMLNode("a", "Click this link", [], {"href": "https://google.com"})
         self.assertEqual(node, node2)
+
+if __name__ == "__main__":
+    unittest.main()

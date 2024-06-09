@@ -26,3 +26,6 @@ class TestMarkdownToBlocks(unittest.TestCase):
         expected = ["This is just one paragraph"]
         self.assertEqual(markdown_to_blocks(markdown), expected)
 
+
+if __name__ == "__main__":
+    unittest.main()

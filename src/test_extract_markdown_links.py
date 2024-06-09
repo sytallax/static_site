@@ -39,3 +39,6 @@ class TestExtractMarkdownFromLinks(unittest.TestCase):
         input = "This is ![not](https://brokenlink.com/fake) a link, but [this](https://image.com/image.png) is an image."
         expected = [("this", "https://image.com/image.png")]
         self.assertEqual(extract_markdown_links(input), expected)
+
+if __name__ == "__main__":
+    unittest.main()

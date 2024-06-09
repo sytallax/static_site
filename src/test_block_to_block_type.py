@@ -38,3 +38,6 @@ class TestBlockToBlockType(unittest.TestCase):
         block = "1. This is item one\n2. This is item two\n3. This is item three"
         expected = "ordered_list"
         self.assertEqual(block_to_block_type(block), expected)
+
+if __name__ == "__main__":
+    unittest.main()

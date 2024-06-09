@@ -64,3 +64,6 @@ class TestParagraphToHTMLNode(unittest.TestCase):
             "", "img", {"src": "https://google.com", "alt": "This is just an image"}
         )
         self.assertEqual(_paragraph_to_html_node(block), expected)
+
+if __name__ == "__main__":
+    unittest.main()
