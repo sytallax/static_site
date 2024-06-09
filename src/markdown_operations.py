@@ -1,11 +1,10 @@
 import re
-import os
 from typing import List, Tuple
-from textnode import TextNode
 
 from htmlnode import HTMLNode
 from leafnode import LeafNode
 from parentnode import ParentNode
+from textnode import TextNode
 
 
 def extract_markdown_images(text: str) -> List[Tuple[str, str]]:
