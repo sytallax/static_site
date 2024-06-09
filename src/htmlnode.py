@@ -2,17 +2,19 @@ from typing import Dict, List, Optional
 
 
 class HTMLNode:
+    """A generic representation of a block of HTML code."""
+
     def __init__(
         self,
         tag: Optional[str] = None,
         value: Optional[str] = None,
-        children: List["HTMLNode"] = [],
-        props: Dict[str, str] = {},
+        children: Optional[List["HTMLNode"]] = None,
+        props: Optional[Dict[str, str]] = None
     ) -> None:
         self.tag = tag
         self.value = value
-        self.children = children
-        self.props = props
+        self.children = children if children is not None else []
+        self.props = props if props is not None else {}
 
     def to_html(self) -> str:
         """Converts the given HTMLNode into an HTML-friendly string"""
@@ -28,7 +30,10 @@ class HTMLNode:
         return result
 
     def __repr__(self) -> str:
-        return f"HTMLNode(tag={self.tag}, value={self.value}, children={self.children}, props={self.props})"
+        return f"HTMLNode(tag={self.tag}, " \
+               f"value={self.value}, " \
+               f"children={self.children}, " \
+               f"props={self.props})" \
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, HTMLNode):
