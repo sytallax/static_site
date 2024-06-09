@@ -1,3 +1,4 @@
+from enum import Enum
 import re
 from typing import List, Tuple
 
@@ -5,6 +6,17 @@ from htmlnode import HTMLNode
 from leafnode import LeafNode
 from parentnode import ParentNode
 from textnode import TextNode, TextNodeType
+
+
+class MarkdownBlockType(Enum):
+    """A representation of valid Markdown Block types."""
+
+    HEADING = "heading"
+    CODE = "code"
+    QUOTE = "quote"
+    UNORDERED_LIST = "unordered_list"
+    ORDERED_LIST = "ordered_list"
+    PARAGRAPH = "paragraph"
 
 
 class MarkdownFormattingError(Exception):
@@ -55,23 +67,27 @@ def markdown_to_blocks(markdown: str) -> List[str]:
     return markdown_split_newline_sanitized
 
 
-def block_to_block_type(markdown_block: str) -> str:
+def block_to_block_type(markdown_block: str) -> MarkdownBlockType:
     """Calculate the type of Markdown block given."""
 
     if re.search(r"(?<!.)(#{1,6} )", markdown_block):
-        return "heading"
+        return MarkdownBlockType.HEADING
     if re.search(r"^```", markdown_block) and re.search(r"```$", markdown_block):
-        return "code"
+        return MarkdownBlockType.CODE
     markdown_block_split = markdown_block.split("\n")
     if all(">" == x[0] for x in markdown_block_split):
-        return "quote"
+        return MarkdownBlockType.QUOTE
     if all("* " == x[:2] or "- " == x[:2] for x in markdown_block_split):
-        return "unordered_list"
+        return MarkdownBlockType.UNORDERED_LIST
     is_block_ordered_list = True
     for i, block in enumerate(markdown_block_split):
         if f"{i+1}. " != block[:3]:
             is_block_ordered_list = False
-    return "ordered_list" if is_block_ordered_list else "paragraph"
+    return (
+        MarkdownBlockType.ORDERED_LIST
+        if is_block_ordered_list
+        else MarkdownBlockType.PARAGRAPH
+    )
 
 
 def markdown_to_html_node(markdown_document: str) -> HTMLNode:
@@ -82,12 +98,12 @@ def markdown_to_html_node(markdown_document: str) -> HTMLNode:
         (block, block_to_block_type(block)) for block in markdown_blocks
     ]
     block_type_conversion_map = {
-        "heading": _heading_to_html_node,
-        "code": _code_to_html_node,
-        "quote": _quote_to_html_node,
-        "unordered_list": _unordered_list_to_html_node,
-        "ordered_list": _ordered_list_to_html_node,
-        "paragraph": _paragraph_to_html_node,
+        MarkdownBlockType.HEADING: _heading_to_html_node,
+        MarkdownBlockType.CODE: _code_to_html_node,
+        MarkdownBlockType.QUOTE: _quote_to_html_node,
+        MarkdownBlockType.UNORDERED_LIST: _unordered_list_to_html_node,
+        MarkdownBlockType.ORDERED_LIST: _ordered_list_to_html_node,
+        MarkdownBlockType.PARAGRAPH: _paragraph_to_html_node,
     }
     blocks_to_html_nodes = [
         block_type_conversion_map[block_type](block)
