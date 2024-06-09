@@ -1,5 +1,4 @@
-from copy_directory_contents import copy_directory_contents
-from page_generator import generate_pages_recursive
+from page_generator import copy_directory_contents, generate_pages_recursive
 
 
 def main():
