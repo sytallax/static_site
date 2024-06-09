@@ -25,4 +25,7 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, help="Port to serve HTTP on", default=8888)
     args = parser.parse_args()
 
-    run(port=args.port, directory=args.dir)
+    try:
+        run(port=args.port, directory=args.dir)
+    except KeyboardInterrupt:
+        print("\nKeyboard interrupt received. Stopping server...")
