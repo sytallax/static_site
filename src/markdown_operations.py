@@ -4,7 +4,16 @@ from typing import List, Tuple
 from htmlnode import HTMLNode
 from leafnode import LeafNode
 from parentnode import ParentNode
-from textnode import TextNode
+from textnode import TextNode, TextNodeType
+
+
+class MarkdownFormattingError(Exception):
+    """A custom error representing incorrect Markdown formatting."""
+
+    def __init__(self, markdown_text: str, message: str):
+        self.markdown_text = markdown_text
+        self.message = message
+        super().__init__(message)
 
 
 def extract_markdown_images(text: str) -> List[Tuple[str, str]]:
@@ -132,11 +141,11 @@ def _paragraph_to_html_node(block: str) -> HTMLNode:
     block_sanitized = block.strip("\n").strip().replace("\n", " ")
     block_textnode = text_to_textnodes(block_sanitized)
     if len(block_textnode) == 1:
-        if block_textnode[0].text_type == "link" and block_textnode[0].url:
+        if block_textnode[0].text_type == TextNodeType.LINK and block_textnode[0].url:
             return LeafNode(
                 block_textnode[0].text, "a", {"href": block_textnode[0].url}
             )
-        if block_textnode[0].text_type == "image" and block_textnode[0].url:
+        if block_textnode[0].text_type == TextNodeType.IMAGE and block_textnode[0].url:
             return LeafNode(
                 "", "img", {"src": block_textnode[0].url, "alt": block_textnode[0].text}
             )
@@ -154,7 +163,7 @@ def extract_title(markdown_document: str):
 
 
 def split_nodes_delimiter(
-    old_nodes: List[TextNode], delimiter: str, text_type: str
+    old_nodes: List[TextNode], delimiter: str, text_type: TextNodeType
 ) -> List[TextNode]:
     """Separate Markdown syntax operations from a TextNode of type
     'text' into its applicable type."""
@@ -164,17 +173,21 @@ def split_nodes_delimiter(
         if not isinstance(node, TextNode):
             output.append(node)
             continue
-        node_split = node.text.split(delimiter)
-        if len(node_split) == 1:
+        node_split_by_delimiter = node.text.split(delimiter)
+        if len(node_split_by_delimiter) == 1:
             output.append(node)
             continue
-        if len(node_split) == 2:
-            raise Exception("Invalid Markdown syntax. No closing delimiter.")
+        if len(node_split_by_delimiter) == 2:
+            raise MarkdownFormattingError(
+                markdown_text=node.text,
+                message="Invalid Markdown syntax. No closing delimiter.",
+            )
         new_textnodes = [
-            TextNode(x, "text")
-            if node_split.index(x) % 2 == 0  # Regular TextNodes will be index 0 and 2
-            else TextNode(x, text_type)  # New type node will be index 1
-            for x in node_split
+            TextNode(node_text, TextNodeType.TEXT)
+            if node_split_by_delimiter.index(node_text) % 2
+            == 0  # Regular TextNodes will be index 0 and 2
+            else TextNode(node_text, TextNodeType(text_type))  # New type node will be index 1
+            for node_text in node_split_by_delimiter
         ]
         output.extend([x for x in new_textnodes if x.text])
 
@@ -198,13 +211,15 @@ def split_nodes_image(old_nodes: List[TextNode]) -> List[TextNode]:
         for index in range(0, len(images_in_node)):
             alt = images_in_node[index][0]
             link = images_in_node[index][1]
-            node_text_split: List[str] = node.text.split(f"![{alt}]({link})", 1)
-            node_split.append(TextNode(node_text_split[0], "text"))
-            node_split.append(TextNode(alt, "image", link))
+            node_with_image_removed: List[str] = node.text.split(f"![{alt}]({link})", 1)
+            node_split.append(TextNode(node_with_image_removed[0], TextNodeType.TEXT))
+            node_split.append(TextNode(alt, TextNodeType.IMAGE, link))
             if index == len(images_in_node) - 1:
-                node_split.append(TextNode(node_text_split[1], "text"))
+                node_split.append(
+                    TextNode(node_with_image_removed[1], TextNodeType.TEXT)
+                )
             else:
-                node = TextNode(node_text_split[1], "text")
+                node = TextNode(node_with_image_removed[1], TextNodeType.TEXT)
         output.extend(node_split)
 
     return [x for x in output if x.text]
@@ -228,12 +243,12 @@ def split_nodes_link(old_nodes: List[TextNode]) -> List[TextNode]:
             alt = links_in_node[index][0]
             link = links_in_node[index][1]
             node_text_split: List[str] = node.text.split(f"[{alt}]({link})", 1)
-            node_split.append(TextNode(node_text_split[0], "text"))
-            node_split.append(TextNode(alt, "link", link))
+            node_split.append(TextNode(node_text_split[0], TextNodeType.TEXT))
+            node_split.append(TextNode(alt, TextNodeType.LINK, link))
             if index == len(links_in_node) - 1:
-                node_split.append(TextNode(node_text_split[1], "text"))
+                node_split.append(TextNode(node_text_split[1], TextNodeType.TEXT))
             else:
-                node = TextNode(node_text_split[1], "text")
+                node = TextNode(node_text_split[1], TextNodeType.TEXT)
         output.extend(node_split)
 
     return [x for x in output if x.text]
@@ -244,16 +259,16 @@ def text_node_to_html_node(text_node: TextNode) -> HTMLNode:
     to its text_type."""
 
     conversion_map = {
-        "text": LeafNode(value=text_node.text),
-        "bold": LeafNode(tag="b", value=text_node.text),
-        "italic": LeafNode(tag="i", value=text_node.text),
-        "code": LeafNode(tag="code", value=text_node.text),
-        "link": LeafNode(
+        TextNodeType.TEXT: LeafNode(value=text_node.text),
+        TextNodeType.BOLD: LeafNode(tag="b", value=text_node.text),
+        TextNodeType.ITALIC: LeafNode(tag="i", value=text_node.text),
+        TextNodeType.CODE: LeafNode(tag="code", value=text_node.text),
+        TextNodeType.LINK: LeafNode(
             tag="a",
             value=text_node.text,
             props={"href": text_node.url} if text_node.url else {},
         ),
-        "image": LeafNode(
+        TextNodeType.IMAGE: LeafNode(
             tag="img",
             value="",
             props={
@@ -263,19 +278,16 @@ def text_node_to_html_node(text_node: TextNode) -> HTMLNode:
         ),
     }
 
-    if text_node.text_type not in conversion_map:
-        raise Exception("TextNode type unknown")
-
     return conversion_map[text_node.text_type]
 
 
 def text_to_textnodes(text: str) -> List[TextNode]:
     """Convert a string of text into TextNodes"""
 
-    nodes: List[TextNode] = [TextNode(text, "text")]
-    nodes = split_nodes_delimiter(nodes, "**", "bold")
-    nodes = split_nodes_delimiter(nodes, "*", "italic")
-    nodes = split_nodes_delimiter(nodes, "`", "code")
+    nodes: List[TextNode] = [TextNode(text, TextNodeType.TEXT)]
+    nodes = split_nodes_delimiter(nodes, "**", TextNodeType.BOLD)
+    nodes = split_nodes_delimiter(nodes, "*", TextNodeType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "`", TextNodeType.CODE)
     nodes = split_nodes_image(nodes)
     nodes = split_nodes_link(nodes)
     return nodes

@@ -1,27 +1,28 @@
 import unittest
 
-from markdown_operations import TextNode, text_to_textnodes
+from markdown_operations import text_to_textnodes
+from textnode import TextNode, TextNodeType
 
 class TestTextToTextNodes(unittest.TestCase):
     def test_all_cases(self):
         text = "This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
         expected = [
-            TextNode("This is ", "text"),
-            TextNode("text", "bold"),
-            TextNode(" with an ", "text"),
-            TextNode("italic", "italic"),
-            TextNode(" word and a ", "text"),
-            TextNode("code block","code"),
-            TextNode(" and an ","text"),
-            TextNode("image", "image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
-            TextNode(" and a ", "text"),
-            TextNode("link", "link", "https://boot.dev"),
+            TextNode("This is ", TextNodeType.TEXT),
+            TextNode("text", TextNodeType.BOLD),
+            TextNode(" with an ", TextNodeType.TEXT),
+            TextNode("italic", TextNodeType.ITALIC),
+            TextNode(" word and a ", TextNodeType.TEXT),
+            TextNode("code block",TextNodeType.CODE),
+            TextNode(" and an ",TextNodeType.TEXT),
+            TextNode("image", TextNodeType.IMAGE, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and a ", TextNodeType.TEXT),
+            TextNode("link", TextNodeType.LINK, "https://boot.dev"),
         ]
         self.assertEqual(text_to_textnodes(text), expected)
 
     def test_only_text(self):
         text = "This is just normal text. This should only return one TextNode object."
-        expected = [TextNode("This is just normal text. This should only return one TextNode object.", "text")]
+        expected = [TextNode("This is just normal text. This should only return one TextNode object.", TextNodeType.TEXT)]
         self.assertEqual(text_to_textnodes(text), expected)
 
 if __name__ == "__main__":
